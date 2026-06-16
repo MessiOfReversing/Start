@@ -1,0 +1,172 @@
+(defpackage :hello-world
+  (:use :cl)
+  (:export :hello))
+(in-package :hello-world)
+(defun hello () "Hello, World!")
+
+
+
+여기서 각각은
+
+
+
+1. ⁠defpackage :hello-world⁠
+ → 지금부터 ⁠"hello-world"⁠라는 이름의 새로운 독립된 공간을 하나 만들겠다는 뜻입니다.
+2. ⁠(:use :cl)⁠
+ → 이 방 안에서 Common Lisp의 기본 도구들(⁠cl⁠)을 자유롭게 사용할 수 있게 허락해 달라는 뜻입니다.
+3. ⁠(:export :hello)⁠
+ → 이 방 안에서 만들 ⁠hello⁠라는 함수는, 만든 공간 밖의 다른 사람들도 열고 들어와서 쓸 수 있게 허락(공개)하겠다는 뜻입니다.
+4. (in-package :hello-world)
+ → 만든 그 공간으로 들어가겠다는 뜻입니다.
+5. (defun 어쩌고
+ → 오직 이 공간에서만 생성되는 그런 함수를 지금부터 선언합니다 라는 뜻임. 아니. 뜻입니다.
+
+
+
+Common Lisp에서는 프로그래머가 컴퓨터가 무시하는 "주석"을 작성할 수 있습니다. 
+한 줄짜리 주석은 하나 이상의 세미콜론( ;)으로 시작하며, 때때로 다음과 같은 형식을 볼 수 있습니다.
+
+(code...) ; => value
+여기서 주석은 해당 줄의 코드를 실행한 후 Common Lisp가 반환하는 값을 나타내는 데 사용됩니다.
+
+코드 줄 끝에 짧은 주석을 달 때는 세미콜론 하나를, 코드 섹션 위에 긴 주석을 달 때는 두 개를,
+함수와 같은 것을 설명하는 긴 주석에는 세 개를, 소스 파일 맨 위에 헤더와 같은 주석에는 네 개를 사용하는 것이 관례적입니다.
+
+
+
+cons에 대하여
+모든 Common Lisp 객체는 "아톰"(단일하고 분할 불가능한 값)이거나 "cons"(구성 함수 "cons"로 생성됨)입니다.
+cons는 첫 번째 요소와 나머지 요소, 이렇게 두 부분으로 구성됩니다.
+이 두 부분을 각각 첫 번째 요소 car요소와 나머지 cdr 요소라고 부릅니다.
+이러한 cons가 코드로 평가될 때, 첫 번째 요소( car)는 호출되는 함수를 나타내고 나머지 요소( cdr)는 해당 함수의 인수를 나타냅니다.
+
+(<function> <arg1> <arg2> ... <argN>)
+; ^ car ^  |        ^ cdr ^
+
+
+
+expressions에 대하여
+모든 Common Lisp 코드는 S-표현식(Symbolic Expressions, 기호 표현식)으로 구성됩니다. 
+이를 줄여서 sexpr이라고 합니다. 모든 sexpr은 atom 또는 cons입니다. S-표현식이 평가될 때, 표현식을 대신하는 값이 자동으로 반환됩니다.
+사용자 정의 함수를 작성할 때(```를 사용하여 defun), 함수 본문 내의 마지막 값이 defun자동으로 반환됩니다.
+
+;; 1. gimme-foo라는 이름의 새로운 함수를 정의합니다.
+(defun gimme-foo () 
+  'foo)             ; 이 함수는 호출되면 'foo 라는 심볼 자체를 반환합니다.
+
+;; 2. 함수를 호출합니다.
+(gimme-foo)         
+
+;; => 결과는 FOO 입니다. (Lisp은 내부적으로 대문자로 처리함)
+
+
+
+만약 작은따옴표를 빼고 ⁠(defun gimme-foo () foo)⁠라고 적었다면, Lisp은 ⁠"foo라는 이름을 가진 변수나 상수를 찾아서 그 값을 꺼내와!"⁠라고
+이해했을 것입니다. 하지만 변수 ⁠foo⁠를 만든 적이 없으니 에러가 났겠죠.
+따라서 ⁠'foo⁠는 "아무 의미도 없고, 값도 담겨있지 않은 그냥 'foo'라는 이름 그 자체인 데이터"를 뜻합니다.
+
+
+
+기호에 대하여
+커먼 리스프에서 심볼은 다른 값을 가리키거나, 키워드 의 경우 자기 자신을 가리킬 수 있는 특수한 값입니다. 
+리스프가 심볼을 평가할 때, 심볼은 해당 심볼이 가리키는 값으로 대체됩니다.
+
+foo  ; => <whatever-foo-points-to>
+:foo ; => :FOO
+키워드는 앞에 콜론( :)이 붙어 있다는 점에 유의하십시오.
+
+'따옴표( S 표현식 앞에 붙이는 것 )는 Lisp에게 해당 표현식을 평가하지 말라고 지시합니다. 
+예제 'foo에서 따옴표를 사용함으로써 defunLisp가 가리켜야 할 대상을 찾으려고 시도하는 대신(그리고 찾지 못하는 대신)
+FOO값을 FOO그대로 반환하도록 했습니다. 만약 `if` FOO가 프로그램 어디에도 정의되어 있지 않다면:
+
+foo  ; => <ERROR! Lisp doesn't know what foo points to!>
+'foo ; => FOO
+
+
+
+
+
+
+
+
+_제대로 정리-
+
+오늘 배운 중요한 내장 함수
+atom⁠: 인자가 아톰(더 이상 쪼갤 수 없는 기본 단위, 예: 심볼, 숫자, 키워드 등)이면 ⁠T⁠, 아니면 ⁠NIL⁠을 반환합니다.
+consp⁠: 인자가 ⁠cons⁠ 셀(두 개의 포인터를 가진 리스트의 기본 단위)이면 ⁠T⁠, 아니면 ⁠NIL⁠을 반환합니다.
+⁠car⁠ (또는 ⁠first⁠): 리스트나 ⁠cons⁠ 셀의 첫 번째 요소를 가져옵니다.
+⁠cdr⁠ (또는 ⁠rest⁠): 리스트나 ⁠cons⁠ 셀의 첫 번째를 제외한 나머지 부분을 가져옵니다.
+
+(defpackage :socks-and-sexprs
+  (:use :cl)
+  (:export :lennys-favorite-food :lennys-secret-keyword
+           :is-an-atom-p :is-a-cons-p :first-thing :rest-of-it))
+
+(in-package :socks-and-sexprs)
+
+;; Evaluates to some symbol (not a keyword)
+(defun lennys-favorite-food ()
+  'lasagna) 
+  
+;; Evaluates to some keyword
+(defun lennys-secret-keyword ()
+  :aliens-are-real) ; 콜론(:)으로 시작하는 키워드는 앞에 따옴표(')가 없어도 자기 자신으로 평가됩니다.
+
+;; Evaluates to T if THING is an atom, NIL otherwise
+(defun is-an-atom-p (thing)
+  (atom thing)) ; 내장 함수 atom을 사용합니다.
+
+;; Evaluates to T if THING is a cons, NIL otherwise
+(defun is-a-cons-p (thing)
+  (consp thing)) ; 내장 함수 consp를 사용합니다.
+
+;;Lisp에서 함수 이름 끝에 붙는 ⁠-p⁠ 또는 p⁠는 Predicate(술어)의 약자입니다.
+즉, "이게 맞니? 틀리니?"를 물어보는 질문형 함수라는 뜻입니다. 다른 언어에서 보통 ⁠is_~⁠ 나 ⁠~?⁠ (예: ⁠is_num()⁠, ⁠empty?⁠)를 쓰는 것과 같습니다.
+ ⁠numberp⁠: 숫자인가? (Number + p)
+ ⁠listp⁠: 리스트인가? (List + p)
+ ⁠consp⁠: cons 객체인가? (Cons + p)
+따라서 (defun is-a-cons-p (thing) ...)⁠는 "thing이 cons인지 확인하는 ⁠is-a-cons-p⁠라는 이름의 함수를 만들겠다"라는 뜻입니다.
+
+
+;; Evaluates to the first part of CONS
+(defun first-thing (cons)
+  (car cons)) ; 또는 (first cons)를 사용해도 똑같이 작동합니다.
+
+;; Evaluates to the 'rest' of the CONS
+(defun rest-of-it (cons)
+  (cdr cons)) ; 또는 (rest cons)를 사용해도 똑같이 작동합니다.
+
+
+
+1. 심볼 vs 키워드
+ ⁠'lasagna⁠처럼 앞에 따옴표(quote)를 붙이면 Lisp은 이를 변수가 아닌 문자 그대로의 심볼(Symbol)로 인식합니다.
+ ⁠:aliens-are-real⁠처럼 앞에 콜론⁠(:)⁠이 붙은 것은 키워드(Keyword)라고 부릅니다. 
+ 키워드는 특수한 심볼로, 앞에 ⁠'⁠를 붙이지 않아도 그 자체로 항상 고유한 값을 가집니다.
+ (⁠':aliens-are-real⁠이라고 써도 문법적으로 틀린 것은 아니지만 보통은 따옴표 없이 ⁠:keyword⁠ 형태로 씁니다.)
+ 
+2. Atom vs Cons
+ Atom: ⁠'one-thing⁠, ⁠10⁠, ⁠:hello⁠ 처럼 단일한 값들을 의미합니다. ⁠(atom 'one-thing)⁠은 ⁠T⁠를 반환합니다.
+ Cons: ⁠'(two things)⁠ 처럼 내부적으로 연결형 노드(Cons Cell) 구조를 가진 리스트를 의미합니다. ⁠(consp '(two things))⁠는 ⁠T⁠를 반환합니다.
+
+ 즉 리스트 ⁠'(A B C)⁠가 있을 때, 그 안에 들어있는 원소 ⁠A⁠, ⁠B⁠, ⁠C⁠를 각각 모두 아톰이라고 부르는것입니다.
+ 그런데 괄호가 아예 없는 그냥 숫자 ⁠100⁠이나, 단독 심볼 ⁠'hello⁠도 더 이상 쪼갤 수 없는 값이기 때문에 리스트 내부에 있든 없든 모두 아톰이라고 부릅니다.
+ 즉, "괄호 ⁠()⁠로 묶이지 않은 모든 데이터"를 아톰이라고 보시면 됩니다.
+
+ cons는 처음 주어진 리스트와, 그 리스트에서 만들어 질 수 있는 모든 경우의 tail들을 의미합니다.
+ 표현하자면
+
+ Atom: ⁠A⁠, ⁠B⁠, ⁠C⁠, ⁠NIL⁠ (더 이상 쪼갤 수 없는 원소들)
+ Cons (최초 리스트와 발생 가능한 모든 Tail들):
+ ⁠'(C)⁠ : Cons 1호기
+ ⁠'(B C)⁠ : Cons 2호기
+ ⁠'(A B C)⁠ : Cons 3호기(전체 리스트)
+ 즉 쉽게 말해, ⁠cons⁠는 두 개의 포인터(메모리 주소)를 가지는 작은 쌍(Pair)입니다.
+ 이 쌍의 앞부분을 ⁠CAR⁠, 뒷부분을 ⁠CDR⁠이라고 부릅니다.
+ ⁠cons⁠ 객체의 예: ⁠(A . B)⁠ -> A와 B의 쌍. 즉 cons = car + cdr
+ Lisp에서 우리가 흔히 아는 리스트 ⁠(1 2 3)⁠도 사실은 이 ⁠cons⁠ 셀 여러 개를 기차놀이처럼 연결해 만든 것입니다.
+
+3. First vs Rest (Car vs Cdr)
+ Lisp에서 리스트는 머리(Head)와 꼬리(Tail)로 나뉩니다.
+ ⁠'(first second third)⁠라는 리스트가 있을 때:
+ ⁠car⁠ (또는 ⁠first⁠)는 첫 번째 요소인 ⁠FIRST⁠를 쏙 빼옵니다.
+ ⁠cdr⁠ (또는 ⁠rest⁠)는 첫 번째를 제외한 나머지 리스트인 ⁠(SECOND THIRD)⁠를 가져옵니다
